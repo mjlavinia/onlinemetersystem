@@ -23,3 +23,5 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")), 
   #  path('', TemplateView.as_view(template_name='login.html'), name='home'), # new
 ]
+
+admin.site.site_header = "Online Meter System "
