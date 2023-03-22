@@ -11,3 +11,5 @@ sqlparse==0.4.3
 tzdata==2022.7
 tzlocal==4.3
 whitenoise==6.4.0
+psycopg2==2.9.5
+psycopg2-binary==2.9.5
