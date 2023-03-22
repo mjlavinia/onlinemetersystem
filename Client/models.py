@@ -16,8 +16,8 @@ class ClientInfo(models.Model):
     zone = models.TextField(null=True)
     billingdate=  models.DateField(blank = False)
     billingday = models.SmallIntegerField(null= False)
-   
     
+      
 class BillingInfo(models.Model):
     meterid = models.BigIntegerField()
     previousreading = models.DecimalField(max_digits=10,decimal_places=2)
