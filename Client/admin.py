@@ -9,7 +9,7 @@ admin.site.register(Billing)
 
 @admin.register(RealTimeBill)
 class RealTimeBillAdmin(admin.ModelAdmin):
-    list_display = ('meterid','totalconsumption','currentread', 'switch')
+    list_display = ('meterid','totalconsumption','currentread')
  
  
 @admin.register(ClientInfo)  
