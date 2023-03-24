@@ -55,7 +55,7 @@ def savemeter(request):
     try:
         id = request.GET.get('meterid')
         test = RealTimeBill.objects.all().values()
-        client = RealTimeBill.objects.get(meterid = id)
+        client = RealTimeBill.objects.filter(meterid = id).first()
         total  = Decimal(request.GET.get('total'))
         current  = Decimal(request.GET.get('current'))
         newMeter = RealTimeBill(meterid = id, totalconsumption = total, timestamp = datetime.now(), currentread = current)
@@ -63,7 +63,7 @@ def savemeter(request):
         if client:
             newMeter.switch = client.switch
         newMeter.save()
-        return JsonResponse({'switch': str(client.switch)})
+        return JsonResponse({'switch': str(newMeter.switch)})
     except Exception as e:
         return JsonResponse({'error': e.args[0]})
 
