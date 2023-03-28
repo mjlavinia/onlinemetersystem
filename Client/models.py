@@ -7,7 +7,7 @@ import datetime
 
 class ClientInfo(models.Model):
     user = models.OneToOneField (User, null=True, on_delete=models.CASCADE)
-    acoountnumber = models.CharField(null=False, blank=False, max_length=20, default='0000-0000-0000')
+    accountnumber = models.CharField(null=False, blank=False, max_length=20, default='0000-0000-0000')
     meterid = models.BigIntegerField(editable=True, default=100000001, null=False, unique=True)
     lastname = models.CharField(null=False, blank=False, max_length=50)
     firstname = models.CharField(null=False, blank=False, max_length=50)
@@ -36,7 +36,7 @@ class BillingInfo(models.Model):
     
 class RealTimeBill(models.Model):
     meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
-    timestamp = models.DateField(auto_now_add=True,null=True)
+    timestamp = models.DateField(null=True)
     totalconsumption = models.DecimalField(max_digits=18, decimal_places=4)
     currentread = models.DecimalField(max_digits=18, decimal_places=4)
     
@@ -50,7 +50,7 @@ class Billing(models.Model):
     meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
     totalconsumed =  models.DecimalField(max_digits=18, decimal_places=4)
     billingyear = models.IntegerField()    
-    billingymonth = models.IntegerField()    
+    billingmonth = models.IntegerField()    
     
     
 class Pricing(models.Model):

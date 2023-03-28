@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import login
-from datetime import datetime
+import datetime
 from decimal import Decimal
 import json
 
@@ -71,17 +71,26 @@ def savemeter(request):
             current  = Decimal(request.GET.get('current'))
             newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
             newMeter.switch = client.switch    
-            addBillRecord(realtimeRecord)              
+            addBillRecord(client.billingdate, newMeter)              
         
         newMeter.save()
         return JsonResponse({'switch': str(client.switch), 'msg':msg})
     except Exception as e:
         return JsonResponse({'error': e.args})
     
-def addBillRecord(client):
-    
-    if client.billingdate == int(datetime.date.today()): 
-         bill = Billing.objects.filter()        
-    billinfo = Billing(meterid_id = client.id, totalconsumed = total, billingyear = datetime.year.today(), billingmonth = datetime.month.today())
-    
+def addBillRecord(billdate, realtime):
 
+
+    if (billdate.day+ 1 == realtime.timestamp.day): 
+        realtimeRecord = RealTimeBill.objects.filter(meterid_id = realtime.meterid_id, timestamp = realtime.timestamp- datetime.timedelta(days = 1)).first()
+       
+        year = realtime.timestamp.year - 1 if realtime.timestamp.month == 1 else realtime.timestamp.year 
+        month = 12 if realtime.timestamp.month == 1 else realtime.timestamp.month -1
+        listing = Billing.objects.filter(meterid_id = realtime.meterid_id, billingyear = year, billingmonth = month).first()
+        
+        if listing is None:           
+            billinfo = Billing(meterid_id = realtime.meterid_id, totalconsumed = realtime.totalconsumption, billingyear = year, billingmonth = month)
+            listing = billinfo
+            
+        listing.totalconsumed = realtimeRecord.totalconsumption    
+        listing.save()
