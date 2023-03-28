@@ -1,3 +1,4 @@
+import calendar
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.template import loader
@@ -12,25 +13,42 @@ from django.contrib.auth import login
 import datetime
 from decimal import Decimal
 import json
+from .tool.functools import setLastMonth,setLastYear
 
 
 
 @login_required(login_url='/accounts/login/')  
 def index(request):
     
-    if request.user.is_authenticated:    
-        dashboardinfo = RealTimeBill.objects.all().values()
-        template = loader.get_template('client/dashboard.html')
+    if request.user.is_authenticated:
+        template = loader.get_template('client/dashboard.html') 
+        current_user = request.user 
+        client = ClientInfo.objects.filter(user_id = current_user.id).first()
+        if client != None:
+            year = setLastYear(datetime.date.today().year, datetime.date.today().month)
+            month = setLastMonth(datetime.date.today().month)
+            billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month).first()
+            if billing is None:
+                billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month-1).first()
+            realtime = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
+            
+        period =   calendar.month_name[billing.billingmonth] +' '+ str(client.billingday) + ',' + str(year) + " - " + calendar.month_name[billing.billingmonth +  1] +' '+  str(client.billingday) + ',' + str(year) 
+
         context = {
-            'dashboardinfo' : dashboardinfo
+            'client' : client,  
+            'billing': billing,
+            'realtime': realtime,
+            'user': current_user,
+            'period':period,
+            'readdate': calendar.month_name[billing.billingmonth] +' '+ str(client.billingday) + ',' + str(year),
+            'prevtotal': billing.totalconsumed * Decimal(1.90)
         }
        
     else:
          template = loader.get_template('accounts/login.html')
-    return HttpResponse(template.render({},request)) 
+    return HttpResponse(template.render(context,request)) 
 
 
-    
 def signup(request):
 	if request.method == "POST":
 		form = NewUserForm(request.POST)
@@ -43,13 +61,20 @@ def signup(request):
 	form = NewUserForm()
 	return render (request=request, template_name="registration/signup.html", context={"register_form":form})
 
+
 def dashboard(request):
-    dashboardinfo = RealTimeBill.objects.all().values()
+    current_user = request
     template = loader.get_template('client/dashboard.html')
+    client = ClientInfo.objects.filter(user_id = id).first()
+    if client != None:
+        billing = Billing.objects.filter(meterid_id = client.meterid).first()
+   
     context = {
-        'dashboardinfo' : dashboardinfo
+        'client' : client,  
+        'billing': billing,
+        'user': current_user
     }
-    return HttpResponse(template.render({},request)) 
+    return HttpResponse(template.render(context, request))
 
 
 def savemeter(request):
@@ -84,8 +109,8 @@ def addBillRecord(billdate, realtime):
     if (billdate.day+ 1 == realtime.timestamp.day): 
         realtimeRecord = RealTimeBill.objects.filter(meterid_id = realtime.meterid_id, timestamp = realtime.timestamp- datetime.timedelta(days = 1)).first()
        
-        year = realtime.timestamp.year - 1 if realtime.timestamp.month == 1 else realtime.timestamp.year 
-        month = 12 if realtime.timestamp.month == 1 else realtime.timestamp.month -1
+        year = setLastYear(realtime.timestamp.yearrealtime.timestamp.month)
+        month = setLastYear(realtime.timestamp.month)
         listing = Billing.objects.filter(meterid_id = realtime.meterid_id, billingyear = year, billingmonth = month).first()
         
         if listing is None:           
@@ -94,3 +119,24 @@ def addBillRecord(billdate, realtime):
             
         listing.totalconsumed = realtimeRecord.totalconsumption    
         listing.save()
+        
+#@login_required(login_url='/accounts/login/')  
+def settings(request,id):
+    if request.user.is_authenticated:
+        template = loader.get_template('client/updatesettings.html')
+        client = ClientInfo.objects.filter(id=id).first()
+        context = {'setting' : client}
+    
+    else:
+        template = loader.get_template('accounts/login.html')
+    return HttpResponse(template.render(context,request))
+
+
+def updatesettings(request,id):
+        checked = request.POST.get('switch-meter', False)
+        template = loader.get_template('client/dashboard.html')
+        client = ClientInfo.objects.filter(id = id).first()
+        client.switch = checked
+        client.save()
+        context={}
+        return HttpResponse(template.render(context,request))   

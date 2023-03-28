@@ -52,6 +52,9 @@ class Billing(models.Model):
     billingyear = models.IntegerField()    
     billingmonth = models.IntegerField()    
     
+    class Meta:
+        unique_together = ('meterid','billingyear', 'billingmonth')
+    
     
 class Pricing(models.Model):
     rate = models.DecimalField(max_digits=18, decimal_places=4)
