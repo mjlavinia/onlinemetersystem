@@ -1,5 +1,5 @@
 {% extends 'main.html' %}
-
+{%load  static %}
 {%block content%}
 <div class="app-wrapper">
   <div class="app-content pt-3 p-md-3 p-lg-4">
@@ -30,6 +30,7 @@
                       <h3 class="notification-title mb-1">Welcome <strong class="a"> {{client.firstname}}
                         {{client.middleinitial}} {{client.lastname}}</strong> </h3>
                     </div><!--//col-->
+                    <label id ="clientid" hidden>{{client.id}}</label>
                   
 
               
@@ -186,59 +187,27 @@
                   </div><!--//row-->
                 </div><!--//app-card-header-->
                 <div class="app-card-body px-4 w-100">
-
                   <div class="item border-bottom py-3">
                     <div class="row justify-content-between align-items-center">
                       <div class="col-auto">
-                        <div class="item-label"><strong>Language </strong></div>
-                        <div class="item-data">English</div>
+                        <div class="item-label"><strong>Current Meter Read</strong></div>
+                        <div class="item-data">in cubic meters</div>
                       </div><!--//col-->
                       <div class="col text-end">
-                        <a class="btn-sm app-btn-secondary" href="#">Change</a>
+                        <h5 class="item-label" id ="currentread"></h5>
                       </div><!--//col-->
                     </div><!--//row-->
                   </div><!--//item-->
+                </div><!--//app-card-body-->
+                <div class="app-card-body px-4 w-100">
                   <div class="item border-bottom py-3">
                     <div class="row justify-content-between align-items-center">
                       <div class="col-auto">
-                        <div class="item-label"><strong>Time Zone</strong></div>
-                        <div class="item-data">Central Standard Time (UTC-6)</div>
+                        <div class="item-label"><strong>Current Meter Read</strong></div>
+                        <div class="item-data">in cubic meters</div>
                       </div><!--//col-->
                       <div class="col text-end">
-                        <a class="btn-sm app-btn-secondary" href="#">Change</a>
-                      </div><!--//col-->
-                    </div><!--//row-->
-                  </div><!--//item-->
-                  <div class="item border-bottom py-3">
-                    <div class="row justify-content-between align-items-center">
-                      <div class="col-auto">
-                        <div class="item-label"><strong>Currency</strong></div>
-                        <div class="item-data">$(US Dollars)</div>
-                      </div><!--//col-->
-                      <div class="col text-end">
-                        <a class="btn-sm app-btn-secondary" href="#">Change</a>
-                      </div><!--//col-->
-                    </div><!--//row-->
-                  </div><!--//item-->
-                  <div class="item border-bottom py-3">
-                    <div class="row justify-content-between align-items-center">
-                      <div class="col-auto">
-                        <div class="item-label"><strong>Email Subscription</strong></div>
-                        <div class="item-data">Off</div>
-                      </div><!--//col-->
-                      <div class="col text-end">
-                        <a class="btn-sm app-btn-secondary" href="#">Change</a>
-                      </div><!--//col-->
-                    </div><!--//row-->
-                  </div><!--//item-->
-                  <div class="item border-bottom py-3">
-                    <div class="row justify-content-between align-items-center">
-                      <div class="col-auto">
-                        <div class="item-label"><strong>SMS Notifications</strong></div>
-                        <div class="item-data">On</div>
-                      </div><!--//col-->
-                      <div class="col text-end">
-                        <a class="btn-sm app-btn-secondary" href="#">Change</a>
+                        <h5 class="item-label" id ="total"></h5>
                       </div><!--//col-->
                     </div><!--//row-->
                   </div><!--//item-->
@@ -257,3 +226,10 @@
 
       <!--//app-wrapper-->
       {%endblock%}
+      {% block footer_scripts %}
+      {{ block.super }}
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript"></script>
+        <script src="{% static 'assets/js/client/singlepage.js' %}"></script>
+
+      {% endblock %}

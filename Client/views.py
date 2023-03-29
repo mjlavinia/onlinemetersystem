@@ -133,10 +133,12 @@ def settings(request,id):
 
 
 def updatesettings(request,id):
-        checked = request.POST.get('switch-meter', False)
-        template = loader.get_template('client/dashboard.html')
-        client = ClientInfo.objects.filter(id = id).first()
-        client.switch = checked
-        client.save()
-        context={}
-        return HttpResponse(template.render(context,request))   
+    checked = request.POST.get('switch-meter', False)    
+    return HttpResponseRedirect(reverse('index'))  
+    
+
+def getmeter(request):
+    id = request.GET.get('id')
+    realtimeRecord = RealTimeBill.objects.filter(meterid_id = id, timestamp = datetime.date.today()).first()
+    # Return a JSON response of the data
+    return JsonResponse({'total': str(realtimeRecord.totalconsumption), 'currentread':str(realtimeRecord.currentread)})

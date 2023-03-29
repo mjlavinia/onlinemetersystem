@@ -10,6 +10,7 @@ urlpatterns = [
     path('savefakemeter',dummy.savefakemeter, name='savefakemeter' ),
     path('settings/<int:id>',views.settings, name='settings' ), 
     path('settings/updatesettings/<int:id>',views.updatesettings, name='updatesettings' ), 
+    path('api/getmeter/',views.getmeter, name='getmeter' ), 
   
   #  path('employee/',views.index, name='employee' ),
   # path('create/',views.create, name='create' ),

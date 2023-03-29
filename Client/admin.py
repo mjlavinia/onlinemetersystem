@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import BillingInfo,ClientInfo,RealTimeBill,Billing
 
-admin.site.register(BillingInfo)
+#admin.site.register(BillingInfo)
 #admin.site.register(RealTimeBill)
 
 admin.site.register(Billing)
@@ -14,7 +14,7 @@ class RealTimeBillAdmin(admin.ModelAdmin):
  
 @admin.register(ClientInfo)  
 class CLientInforAdmin(admin.ModelAdmin):
-    list_display = ('user','meterid','fullname')
+    list_display = ('meterid','fullname','switch','meterserial')
     
     @admin.display(description='Name')
     def fullname(self,obj):
