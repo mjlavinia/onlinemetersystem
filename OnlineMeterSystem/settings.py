@@ -148,4 +148,4 @@ LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "logout" # new
 LOGIN_URL = 'login'
 
-CSRF_TRUSTED_ORIGINS = ['https://colossal-pets-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://oninemetermysqlproject-production.up.railway.app']
