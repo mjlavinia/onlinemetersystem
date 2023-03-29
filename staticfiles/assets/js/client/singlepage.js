@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    uri = 'http://127.0.0.1:8000/api/getmeter?id=' + document.getElementById('clientid').innerHTML
+    uri = 'https://oninemetermysqlproject-production.up.railway.app/api/getmeter?id=' + document.getElementById('clientid').innerHTML
     function fetchValue() {
         fetch(uri)
           .then(response => response.json())
