@@ -18,6 +18,7 @@ class ClientInfo(models.Model):
     billingdate=  models.DateField(blank = True)
     billingday = models.SmallIntegerField(null= False)
     switch = models.BooleanField()
+    isactive = models.BooleanField()
     
     def __str__(self):
         return str(self.meterid)
@@ -42,6 +43,7 @@ class RealTimeBill(models.Model):
     
     class Meta:
         unique_together = ('meterid', 'timestamp',)
+        ordering = ('meterid','-timestamp',)
 
   #  client_billinginfo = models.ForeignKey(ClientInfo, null=True, on_delete=models.CASCADE)
     
