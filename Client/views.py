@@ -19,8 +19,9 @@ from .tool.functools import setLastMonth,setLastYear
 
 @login_required(login_url='/accounts/login/')  
 def index(request):
+    context = None
     
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff == False:
         template = loader.get_template('client/dashboard.html') 
         current_user = request.user 
         client = ClientInfo.objects.filter(user_id = current_user.id).first()
@@ -45,7 +46,10 @@ def index(request):
         }
        
     else:
-         template = loader.get_template('accounts/login.html')
+        if request.user.is_authenticated: 
+            from django.contrib.auth import logout
+            logout(request) 
+        template = loader.get_template('registration/login.html')
     return HttpResponse(template.render(context,request)) 
 
 
@@ -68,6 +72,22 @@ def dashboard(request):
     client = ClientInfo.objects.filter(user_id = id).first()
     if client != None:
         billing = Billing.objects.filter(meterid_id = client.meterid).first()
+   
+    context = {
+        'client' : client,  
+        'billing': billing,
+        'user': current_user
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def chart(request):
+    current_user = request
+    template = loader.get_template('client/chart.html')
+    client = ClientInfo.objects.filter(user_id = id).first()
+    start_date = datetime.datetime.now() - datetime.timedelta(30)
+    if client != None:
+        consumed_in_a_month = RealTimeBill.objects.filter(meterid_id = client.meterid, timestamp >= start_date)
    
     context = {
         'client' : client,  

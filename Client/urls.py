@@ -6,6 +6,7 @@ urlpatterns = [
     path ('', views.index, name='index'),
     path("signup/", views.signup, name="signup"),
     path('dashboard/',views.dashboard, name='dashboard' ),
+    path('chart/',views.dashboard, name='dashboard' ),
     path('savemeter/',views.savemeter, name='savemeter' ),
     path('savefakemeter',dummy.savefakemeter, name='savefakemeter' ),
     path('settings/<int:id>',views.settings, name='settings' ), 
