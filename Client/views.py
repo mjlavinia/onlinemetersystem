@@ -14,8 +14,8 @@ import datetime
 from decimal import Decimal
 import json
 from .tool.functools import setLastMonth,setLastYear
-
-
+from django.core import serializers
+from django.utils.timezone import localtime
 
 @login_required(login_url='/accounts/login/')  
 def index(request):
@@ -69,7 +69,7 @@ def signup(request):
 def dashboard(request):
     current_user = request
     template = loader.get_template('client/dashboard.html')
-    client = ClientInfo.objects.filter(user_id = id).first()
+    client = ClientInfo.objects.filter(user_id = request.user.id).first()
     if client != None:
         billing = Billing.objects.filter(meterid_id = client.meterid).first()
    
@@ -84,16 +84,19 @@ def dashboard(request):
 def chart(request):
     current_user = request
     template = loader.get_template('client/chart.html')
-    client = ClientInfo.objects.filter(user_id = id).first()
+    client = ClientInfo.objects.filter(user_id = request.user.id).first()
     start_date = datetime.datetime.now() - datetime.timedelta(30)
     if client != None:
-        consumed_in_a_month = RealTimeBill.objects.filter(meterid_id = client.meterid, timestamp >= start_date)
-   
+        consumed_in_a_month = RealTimeBill.objects.filter(meterid_id =   client.id,timestamp__gte = start_date).all()
+     
+        cdata = serializers.serialize("json", list(consumed_in_a_month), fields = ("timestamp", "totalconsumption", "currentread"))
+
     context = {
         'client' : client,  
-        'billing': billing,
+        'data': cdata   ,
         'user': current_user
-    }
+    }  
+    
     return HttpResponse(template.render(context, request))
 
 
@@ -161,4 +164,13 @@ def getmeter(request):
     id = request.GET.get('id')
     realtimeRecord = RealTimeBill.objects.filter(meterid_id = id, timestamp = datetime.date.today()).first()
     # Return a JSON response of the data
-    return JsonResponse({'total': str(realtimeRecord.totalconsumption), 'currentread':str(realtimeRecord.currentread)})
+    return JsonResponse({'dateread': str((datetime.datetime.today())),'total': str(realtimeRecord.totalconsumption), 'currentread':str(realtimeRecord.currentread)})
+
+def logoutclient(request):
+    from django.contrib.auth import logout
+    logout(request)
+
+def notfound(request):
+    template = loader.get_template('404.html')
+    context = None
+    return HttpResponse(template.render(context,request))

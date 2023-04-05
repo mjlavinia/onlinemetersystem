@@ -8,6 +8,7 @@ $(document).ready(function () {
             // Update the value element with the new value
             document.getElementById('currentread').innerHTML = data.currentread
             document.getElementById('total').innerHTML = data.total
+            
           })
           .catch(error => {
             console.error('Error fetching value:', error);
