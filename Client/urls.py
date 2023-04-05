@@ -5,6 +5,7 @@ from .tool import dummy
 urlpatterns = [
     path ('', views.index, name='index'),
     path("signup/", views.signup, name="signup"),
+    path("404/", views.notfound, name="404"),
     path('dashboard/',views.dashboard, name='dashboard' ),
     path('chart/',views.chart, name='chart' ),
     path('savemeter/',views.savemeter, name='savemeter' ),

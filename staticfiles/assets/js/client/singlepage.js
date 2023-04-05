@@ -1,5 +1,9 @@
 $(document).ready(function () {
-  uri = 'http://127.0.0.1:8000/api/getmeter?id=' + document.getElementById('clientid').innerHTML
+  const {
+    host, hostname, href, origin, pathname, port, protocol, search
+  } = window.location
+
+  uri = origin + '/api/getmeter?id=' + document.getElementById('clientid').innerHTML
   function fetchValue() {
       fetch(uri)
         .then(response => response.json())
