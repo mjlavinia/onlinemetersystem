@@ -14,12 +14,6 @@ class Migration(migrations.Migration):
             name='realtimebill',
             options={'ordering': ('meterid', '-timestamp')},
         ),
-        migrations.AddField(
-            model_name='clientinfo',
-            name='isactive',
-            field=models.BooleanField(default=True),
-            preserve_default=False,
-        ),
         migrations.AlterUniqueTogether(
             name='billing',
             unique_together={('meterid', 'billingyear', 'billingmonth')},

@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.template import loader
 from django.urls import reverse
-from .models import ClientInfo,RealTimeBill, BillingInfo, Billing
+from .models import ClientInfo,RealTimeBill, BillingInfo, Billing,MeterLog
 from django.views import generic
 from .forms import NewUserForm
 from django.urls import reverse_lazy
@@ -31,6 +31,7 @@ def index(request):
             billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month).first()
             if billing is None:
                 billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month-1).first()
+                   
             realtime = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
             
         period =   calendar.month_name[billing.billingmonth] +' '+ str(client.billingday) + ',' + str(year) + " - " + calendar.month_name[billing.billingmonth +  1] +' '+  str(client.billingday) + ',' + str(year) 
@@ -105,6 +106,8 @@ def savemeter(request):
         id = request.GET.get('meterid')
         
         client = ClientInfo.objects.get(meterid = id)
+        now = datetime.datetime.now()
+        
         
         if client:
 
@@ -119,7 +122,13 @@ def savemeter(request):
             current  = Decimal(request.GET.get('current'))
             newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
             newMeter.switch = client.switch    
-            addBillRecord(client.billingdate, newMeter)              
+            addBillRecord(client.billingdate, newMeter)     
+            
+            if now.minute == 0:
+                meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
+                meterlog.save()  
+                
+
         
         newMeter.save()
         return JsonResponse({'switch': str(client.switch), 'msg':msg})
@@ -147,7 +156,10 @@ def addBillRecord(billdate, realtime):
 def settings(request,id):
     if request.user.is_authenticated:
         template = loader.get_template('client/updatesettings.html')
-        client = ClientInfo.objects.filter(id=id).first()
+        client = ClientInfo.objects.filter(user_id = request.user.id).first()
+        client.switchid = 1
+        if client.switch:
+                client.switchid = 2
         context = {'setting' : client}
     
     else:
@@ -164,7 +176,7 @@ def getmeter(request):
     id = request.GET.get('id')
     realtimeRecord = RealTimeBill.objects.filter(meterid_id = id, timestamp = datetime.date.today()).first()
     # Return a JSON response of the data
-    return JsonResponse({'dateread': str((datetime.datetime.today())),'total': str(realtimeRecord.totalconsumption), 'currentread':str(realtimeRecord.currentread)})
+    return JsonResponse({'dateread': str((datetime.datetime.today())),'total': str(realtimeRecord.totalconsumption/1000), 'currentread':str(realtimeRecord.currentread)})
 
 def logoutclient(request):
     from django.contrib.auth import logout
@@ -174,3 +186,4 @@ def notfound(request):
     template = loader.get_template('404.html')
     context = None
     return HttpResponse(template.render(context,request))
+

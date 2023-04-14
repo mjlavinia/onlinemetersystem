@@ -62,6 +62,13 @@ class Pricing(models.Model):
     rate = models.DecimalField(max_digits=18, decimal_places=4)
     discountpercent = models.DecimalField(max_digits=8,decimal_places=4)
     
+class MeterLog(models.Model):
+    timestamp = models.DateTimeField
+    meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
+    totalconsumption = models.DecimalField(max_digits=18, decimal_places=4)
+    currentread = models.DecimalField(max_digits=18, decimal_places=4)
+    
+    
 
 
 
