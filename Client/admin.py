@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.forms import Select
-from .models import BillingInfo,ClientInfo,RealTimeBill,Billing,MeterLog
+from .models import BillingInfo,ClientInfo,RealTimeBill,Billing,MeterLog,Pricing
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 
 #admin.site.register(BillingInfo)
@@ -37,6 +37,11 @@ class RealTimeBillAdmin(admin.ModelAdmin):
     model = RealTimeBill
     list_display = ('timestamp', 'totalconsumption', 'currentread') 
     list_filter = ['meterid']
+    
+@admin.register(Pricing)  
+class PricingAdmin(admin.ModelAdmin):
+    model = Pricing
+    
 
 #class RealTimeBill(admin.TabularInline):
 #    model = RealTimeBill
