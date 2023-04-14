@@ -124,8 +124,9 @@ def savemeter(request):
             newMeter.switch = client.switch    
             addBillRecord(client.billingdate, newMeter)     
             
-            if now.minute == 0:
-                meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
+            if now.minute == 59:
+                meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
+                meterlog.timestamp = datetime.datetime.now()
                 meterlog.save()  
                 
 
@@ -136,8 +137,6 @@ def savemeter(request):
         return JsonResponse({'error': e.args})
     
 def addBillRecord(billdate, realtime):
-
-
     if (billdate.day+ 1 == realtime.timestamp.day): 
         realtimeRecord = RealTimeBill.objects.filter(meterid_id = realtime.meterid_id, timestamp = realtime.timestamp- datetime.timedelta(days = 1)).first()
        
