@@ -56,7 +56,7 @@
             <div class="row">
 
             
-              <label id="clientid" hidden>{{client.id}}</label>
+              
             </div>
           </div>
         </div>
@@ -252,7 +252,7 @@
                 
                     </div><!--//col-->
                     <div class="col text-end">
-                      <b class="item-label">{% now "SHORT_DATETIME_FORMAT" %}</b>
+                      <b class="item-label"   id ="dateread">{% now "SHORT_DATETIME_FORMAT" %}</b>
                     </div><!--//col-->
                   </div><!--//row-->
                 </div><!--//item-->
@@ -299,6 +299,5 @@
     {{ block.super }}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript"></script>
-    <script src="{% static 'assets/js/client/singlepage.js' %}"></script>
 
     {% endblock %}

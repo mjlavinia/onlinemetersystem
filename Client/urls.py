@@ -5,7 +5,8 @@ from .tool import dummy
 urlpatterns = [
     path ('', views.index, name='index'),
     path("signup/", views.signup, name="signup"),
-    path("404/", views.notfound, name="404"),
+    path('notifications/', views.notifications, name="notifications"),
+    path('404/', views.notfound, name="404"),
     path('dashboard/',views.dashboard, name='dashboard' ),
     path('chart/',views.chart, name='chart' ),
     path('savemeter/',views.savemeter, name='savemeter' ),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('settings/<int:id>',views.settings, name='settings' ), 
     path('settings/updatesettings/<int:id>',views.updatesettings, name='updatesettings' ), 
     path('api/getmeter/',views.getmeter, name='getmeter' ), 
+    path('api/getnotif/',views.getnotif, name='getnotif' ), 
   
   #  path('employee/',views.index, name='employee' ),
   # path('create/',views.create, name='create' ),

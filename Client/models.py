@@ -61,12 +61,12 @@ class Billing(models.Model):
 class Pricing(models.Model):
     rangefrom = models.IntegerField()
     rangeto = models.IntegerField()
-    residentalrate = models.DecimalField(max_digits=18, decimal_places=2)
-    commercialrate1 = models.DecimalField(max_digits=18, decimal_places=2)
-    commercialrate2 = models.DecimalField(max_digits=18, decimal_places=2)
-    commercialrate3 = models.DecimalField(max_digits=18, decimal_places=2)
-    commercialrate4 = models.DecimalField(max_digits=18, decimal_places=2)
-    commercialrate5 = models.DecimalField(max_digits=18, decimal_places=2)
+    residentialrate = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    commercialrate1 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    commercialrate2 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    commercialrate3 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    commercialrate4 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    commercialrate5 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
    
     
 class MeterLog(models.Model):
@@ -76,7 +76,12 @@ class MeterLog(models.Model):
     currentread = models.DecimalField(max_digits=18, decimal_places=4)
     
     
-
+    
+class Notifications(models.Model):
+    timestamp = models.DateTimeField(default=None)
+    meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
+    message = models.CharField(blank = False, default='', max_length=100)
+    isseen = models.BooleanField()
 
 
     

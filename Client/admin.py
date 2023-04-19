@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.forms import Select
-from .models import BillingInfo,ClientInfo,RealTimeBill,Billing,MeterLog,Pricing
+from .models import BillingInfo,ClientInfo,RealTimeBill,Billing,MeterLog,Pricing,Notifications
 from django_admin_inline_paginator.admin import TabularInlinePaginated
+import datetime
 
 #admin.site.register(BillingInfo)
 #admin.site.register(RealTimeBill)
@@ -16,10 +17,8 @@ class tabularRealtime(TabularInlinePaginated):
 class Billings(TabularInlinePaginated):
     model = Billing
     fields = ('billingmonth', 'billingyear', 'totalconsumed') 
-    per_page = 10
+    per_page = 10 
     
-    
-
 @admin.register(ClientInfo)  
 class CLientInforAdminWithPage(admin.ModelAdmin):
     list_display = ('meterid','fullname','switch','meterserial')
@@ -29,7 +28,20 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
     @admin.display(description='Name')
     def fullname(self,obj):
         return ("%s %s" % (obj.firstname, obj.lastname)).upper()
+    
+    def save_model(self, request, obj, form, change):
+        #obj.some_field = some_value # Update some_field with the desired value
+        super().save_model(request, obj, form, change) # Call the superclass method to save the model
+        notif = Notifications()
+        if obj.isactive == False:
+            notif.message = 'The admin has made your account inactive. Please check with the admin the status of your acount.'
+        else:
+            notif.message = 'The admin has activated your account.'
 
+        notif.meterid_id = obj.id
+        notif.timestamp = datetime.datetime.now()
+        notif.isseen = False
+        notif.save()
 # Register your models here..re
 
 @admin.register(RealTimeBill)
@@ -41,8 +53,21 @@ class RealTimeBillAdmin(admin.ModelAdmin):
 @admin.register(Pricing)  
 class PricingAdmin(admin.ModelAdmin):
     model = Pricing
-    
+    list_display = ('rangefrom','rangeto','residentialrate','commercialrate1','commercialrate2','commercialrate3','commercialrate4','commercialrate5')
 
+    
+    
+@admin.register(MeterLog)  
+class MeterlogAdmin(admin.ModelAdmin):
+    model = MeterLog
+
+
+@admin.register(Notifications)
+class NotificationsAdmin(admin.ModelAdmin):
+    model = Notifications
+    verbose_name_plural = "Notifications" 
+    
+    
 #class RealTimeBill(admin.TabularInline):
 #    model = RealTimeBill
 #    max_num = 10

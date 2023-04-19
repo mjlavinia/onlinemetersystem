@@ -9,16 +9,18 @@ $(document).ready(function () {
         .then(response => response.json())
         .then(data => {
           console.log(data)
+          const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true };
+          dateread = data.dateread.toLocaleString('en-US', options)
           // Update the value element with the new value
           document.getElementById('currentread').innerHTML = data.currentread
           document.getElementById('total').innerHTML = data.total
-          document.getElementById('dateread').innerHTML = data.dateread
+          document.getElementById('dateread').innerHTML = dateread
         })
         .catch(error => {
           console.error('Error fetching value:', error);
-        });
+        }); 
     }
     
     // Call the fetchValue function every second
     setInterval(fetchValue, 1000);
-});
+  });

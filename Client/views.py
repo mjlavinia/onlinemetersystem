@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.template import loader
 from django.urls import reverse
-from .models import ClientInfo,RealTimeBill, BillingInfo, Billing,MeterLog
+from .models import ClientInfo,RealTimeBill, BillingInfo, Billing,MeterLog,Notifications
 from django.views import generic
 from .forms import NewUserForm
 from django.urls import reverse_lazy
@@ -13,11 +13,11 @@ from django.contrib.auth import login
 import datetime
 from decimal import Decimal
 import json
-from .tool.functools import setLastMonth,setLastYear
+from .tool.functools import setLastMonth,setLastYear,setTimeNotifications
 from django.core import serializers
 from django.utils.timezone import localtime
 
-@login_required(login_url='/accounts/login/')  
+@login_required(login_url='/accounts/login/')   
 def index(request):
     context = None
     
@@ -152,6 +152,8 @@ def addBillRecord(billdate, realtime):
         listing.save()
         
 #@login_required(login_url='/accounts/login/')  
+
+
 def settings(request,id):
     if request.user.is_authenticated:
         template = loader.get_template('client/updatesettings.html')
@@ -159,12 +161,39 @@ def settings(request,id):
         client.switchid = 1
         if client.switch:
                 client.switchid = 2
-        context = {'setting' : client}
+                
+        context = {'client' : client}
     
     else:
         template = loader.get_template('accounts/login.html')
     return HttpResponse(template.render(context,request))
 
+
+@login_required(login_url='/accounts/login/')  
+
+
+def notifications(request):
+    if request.user.is_authenticated:
+        param = request.GET.get('param')
+        id = request.GET.get('id')
+        if id:
+            notif = Notifications.objects.filter(id = id).order_by('-timestamp', 'isseen').all()
+            savenotif = notif.first()
+            savenotif.isseen = True
+            savenotif.save()
+        else:
+            notif = Notifications.objects.filter(meterid_id = param).order_by('-timestamp', 'isseen').all()[:10]
+            period_dateNotification(notif)
+        template ='client/notifications.html'  
+        client =ClientInfo()
+        client.id = param
+        context = {
+        'notif': notif,
+        'client':client
+             }
+        return render(request, template, context)
+    else:
+        return HttpResponseRedirect(reverse('404'))
 
 def updatesettings(request,id):
     checked = request.POST.get('switch-meter', False)    
@@ -177,6 +206,19 @@ def getmeter(request):
     # Return a JSON response of the data
     return JsonResponse({'dateread': str((datetime.datetime.today())),'total': str(realtimeRecord.totalconsumption/1000), 'currentread':str(realtimeRecord.currentread)})
 
+def getnotif(request):
+    id = request.GET.get('id')
+    data = Notifications.objects.filter(meterid_id = id).order_by('-timestamp', 'isseen').all().values()[:10]
+    for d in data:
+        d['period']= setTimeNotifications(d.get('timestamp'))
+    notif = json.dumps(list(data), default=str)
+    # Return a JSON response of the data
+    return JsonResponse(notif,safe = False)
+
+
+
+
+
 def logoutclient(request):
     from django.contrib.auth import logout
     logout(request)
@@ -185,4 +227,10 @@ def notfound(request):
     template = loader.get_template('404.html')
     context = None
     return HttpResponse(template.render(context,request))
+
+def period_dateNotification(notifdata):
+    
+    for r in notifdata:
+        r.period = setTimeNotifications(r.timestamp)
+    
 

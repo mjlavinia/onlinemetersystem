@@ -7522,3 +7522,4 @@ OnlineMeterSystem/settings.py
 OnlineMeterSystem/settings.py
 OnlineMeterSystem/settings.py
 .gitignore
+Client/templates/client/test.html
