@@ -1,4 +1,5 @@
 import datetime
+from django.utils import timezone
 
 def setLastYear(year, month):
     yr =year - 1 if month == 1 else year 
@@ -11,9 +12,9 @@ def setLastMonth(month):
 
 from datetime import datetime
 def setTimeNotifications(date):
-    sent_time = date.replace(tzinfo=None)
-    current_time = datetime.now()
-    time_since_sent = current_time.replace(tzinfo=None) - sent_time
+    sent_time = date
+    current_time = timezone.now()
+    time_since_sent = current_time - sent_time
     days_since_sent = time_since_sent.days
     hours_since_sent = int(time_since_sent.seconds / 3600)
     minutes_since_sent = int((time_since_sent.seconds % 3600) / 60)

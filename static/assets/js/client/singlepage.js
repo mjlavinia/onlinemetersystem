@@ -18,6 +18,7 @@ $(document).ready(function () {
         document.getElementById('currentread').innerHTML = data.currentread
         document.getElementById('total').innerHTML = data.total
         document.getElementById('dateread').innerHTML = dateread
+        document.getElementById('amount').innerHTML = data.amount
       })
       .catch(error => {
         console.error('Error fetching value:', error);
@@ -49,10 +50,10 @@ $(document).ready(function () {
               <div class="info">`
 
 
-          if (r.isseen === true)   
+          if (r.isseen == true)   
               html+= ` <div class="desc">${r.message} </div>`
           else
-              html+= ` <div class="desc"><strong>${r.message}<strong> </div>`  
+              html+= ` <div class="desc"><strong>${r.message}</strong> </div>`  
               
               
           html+= ` <div class="meta">${r.period}</div>
@@ -60,9 +61,10 @@ $(document).ready(function () {
             </div><!--//col-->
           </div><!--//row-->
           <a class="link-mask" href= "../notifications?id=${r.id}&param=${clientid}"></a>
-        </div>`
+        </div> </div>`
           console.log(html)
-          if (r.isseen === false) {count ++ }
+          if (r.isseen == false) 
+          {count ++ }
         
           
         })
@@ -81,11 +83,8 @@ $(document).ready(function () {
 
   // Call the fetchValue function every second
   setInterval(getNotifications, 60000);
+  setInterval(fetchValue, 5000);
 
   // Call the fetchValue function every second
 
-
-  if(window.location.pathname === "/"){
-    setInterval(fetchValue, 1000);
-}
 });

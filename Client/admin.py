@@ -19,10 +19,15 @@ class Billings(TabularInlinePaginated):
     fields = ('billingmonth', 'billingyear', 'totalconsumed') 
     per_page = 10 
     
+class MeterlogDetail(TabularInlinePaginated):
+    model = MeterLog
+    fields = ('timestamp', 'meterid','currentread', 'totalconsumption')
+    per_page = 10
+    
 @admin.register(ClientInfo)  
 class CLientInforAdminWithPage(admin.ModelAdmin):
     list_display = ('meterid','fullname','switch','meterserial')
-    inlines = (Billings,tabularRealtime)
+    inlines = (Billings,tabularRealtime,MeterlogDetail)
     model = ClientInfo
     
     @admin.display(description='Name')
@@ -53,19 +58,21 @@ class RealTimeBillAdmin(admin.ModelAdmin):
 @admin.register(Pricing)  
 class PricingAdmin(admin.ModelAdmin):
     model = Pricing
-    list_display = ('rangefrom','rangeto','residentialrate','commercialrate1','commercialrate2','commercialrate3','commercialrate4','commercialrate5')
+    list_display = ('rangefrom','rangeto','isflatrate','residentialrate','commercialrate1','commercialrate2','commercialrate3','commercialrate4','commercialrate5')
 
     
     
 @admin.register(MeterLog)  
 class MeterlogAdmin(admin.ModelAdmin):
     model = MeterLog
+    list_display = ('timestamp', 'meterid','currentread', 'totalconsumption')
 
-
+    
 @admin.register(Notifications)
 class NotificationsAdmin(admin.ModelAdmin):
     model = Notifications
-    verbose_name_plural = "Notifications" 
+    verbose_name_plural = "Notification" 
+    list_display = ('id', 'message', 'isseen') 
     
     
 #class RealTimeBill(admin.TabularInline):

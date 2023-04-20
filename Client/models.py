@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib import admin
 from django.contrib.auth.models import User
-import datetime
+import datetime 
+from django.utils import timezone
 # Create your models here.
 
 
@@ -47,7 +48,6 @@ class RealTimeBill(models.Model):
 
   #  client_billinginfo = models.ForeignKey(ClientInfo, null=True, on_delete=models.CASCADE)
     
-    
 class Billing(models.Model):
     meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
     totalconsumed =  models.DecimalField(max_digits=18, decimal_places=4)
@@ -61,6 +61,7 @@ class Billing(models.Model):
 class Pricing(models.Model):
     rangefrom = models.IntegerField()
     rangeto = models.IntegerField()
+    isflatrate = models.BooleanField(default=False)
     residentialrate = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     commercialrate1 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
     commercialrate2 = models.DecimalField(max_digits=18, decimal_places=2, default=0)
@@ -70,7 +71,7 @@ class Pricing(models.Model):
    
     
 class MeterLog(models.Model):
-    timestamp = models.DateField
+    timestamp = models.DateTimeField(default= timezone.now())
     meterid = models.ForeignKey(ClientInfo, default=1, verbose_name="MeterID", on_delete=models.SET_DEFAULT)
     totalconsumption = models.DecimalField(max_digits=18, decimal_places=4)
     currentread = models.DecimalField(max_digits=18, decimal_places=4)

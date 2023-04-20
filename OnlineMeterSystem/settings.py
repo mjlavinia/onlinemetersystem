@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic', 
+    'django_admin_inline_paginator',
     'Client',
     ]
 
@@ -89,10 +90,10 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'mydb',
         'USER': 'root',
-        'PASSWORD': 'Thesis1234!',
-        'HOST':'localhost',
-        'PORT':'3306',}
-        
+        'PASSWORD': '8Ino9LFvMLZJopJ8pJxx',
+        'HOST':'containers-us-west-20.railway.app',
+        'PORT':'7748',}
+      
 }
 
 
@@ -123,7 +124,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Hongkong'
 
 USE_I18N = True
 
@@ -146,8 +147,8 @@ STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "logout" # new
+LOGIN_REDIRECT_URL = ""
+LOGOUT_REDIRECT_URL = "login" # new
 LOGIN_URL = 'login'
 
-CSRF_TRUSTED_ORIGINS = ['https://onlinemetermysqlproject-production.up.railway.app','http://127.0.0.1:8000/']
+CSRF_TRUSTED_ORIGINS = ['https://onlinemetermysqlproject-production.up.railway.app']

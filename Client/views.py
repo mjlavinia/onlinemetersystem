@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.template import loader
 from django.urls import reverse
-from .models import ClientInfo,RealTimeBill, BillingInfo, Billing,MeterLog,Notifications
+from .models import ClientInfo,RealTimeBill, BillingInfo, Billing,MeterLog,Notifications,Pricing
 from django.views import generic
 from .forms import NewUserForm
 from django.urls import reverse_lazy
@@ -106,7 +106,8 @@ def savemeter(request):
         id = request.GET.get('meterid')
         
         client = ClientInfo.objects.get(meterid = id)
-        now = datetime.datetime.now()
+        from django.utils import timezone
+        now = timezone.now()
         
         
         if client:
@@ -124,7 +125,7 @@ def savemeter(request):
             newMeter.switch = client.switch    
             addBillRecord(client.billingdate, newMeter)     
             
-            if now.minute == 59:
+            if now.minute == 58:
                 meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
                 meterlog.timestamp = datetime.datetime.now()
                 meterlog.save()  
@@ -176,17 +177,22 @@ def notifications(request):
     if request.user.is_authenticated:
         param = request.GET.get('param')
         id = request.GET.get('id')
+        clientid = param
+        
         if id:
             notif = Notifications.objects.filter(id = id).order_by('-timestamp', 'isseen').all()
             savenotif = notif.first()
+            savenotif.period = setTimeNotifications(savenotif.timestamp)
+            clientid = savenotif.meterid_id
             savenotif.isseen = True
             savenotif.save()
+            notif = [savenotif]
+            
         else:
             notif = Notifications.objects.filter(meterid_id = param).order_by('-timestamp', 'isseen').all()[:10]
             period_dateNotification(notif)
         template ='client/notifications.html'  
-        client =ClientInfo()
-        client.id = param
+        client = ClientInfo.objects.get(id = param)
         context = {
         'notif': notif,
         'client':client
@@ -203,8 +209,10 @@ def updatesettings(request,id):
 def getmeter(request):
     id = request.GET.get('id')
     realtimeRecord = RealTimeBill.objects.filter(meterid_id = id, timestamp = datetime.date.today()).first()
+    realtime = round(realtimeRecord.totalconsumption/1000,2)
+    currentread = round(realtimeRecord.currentread,2)
     # Return a JSON response of the data
-    return JsonResponse({'dateread': str((datetime.datetime.today())),'total': str(realtimeRecord.totalconsumption/1000), 'currentread':str(realtimeRecord.currentread)})
+    return JsonResponse({'dateread': str((datetime.datetime.today())),'total':str(realtime), 'currentread':str(currentread),'amount': 'Php ' +  str(pricing(realtimeRecord.totalconsumption/1000))})
 
 def getnotif(request):
     id = request.GET.get('id')
@@ -217,7 +225,22 @@ def getnotif(request):
 
 
 
+def pricing(consumed):
+    pricetable =  Pricing.objects.all()
+    price =0
+    baseprice = 0
+    minconsumed = 0
+    excess = 0
+    for rate in pricetable:
+        if rate.isflatrate:
+                    baseprice = rate.residentialrate
+                    minconsumed = rate.rangeto   
+        else:
+            if rate.rangefrom <= consumed and rate.rangeto >= consumed: 
+                excess = consumed - minconsumed
 
+    price = baseprice + (excess * rate.residentialrate)                
+    return round(price,2)
 
 def logoutclient(request):
     from django.contrib.auth import logout
