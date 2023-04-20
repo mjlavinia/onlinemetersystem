@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic', 
-    'django_admin_inline_paginator',
     'Client',
     ]
 
@@ -124,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Hongkong'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -147,8 +146,8 @@ STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = ""
-LOGOUT_REDIRECT_URL = "login" # new
+LOGIN_REDIRECT_URL = "home"
+LOGOUT_REDIRECT_URL = "logout" # new
 LOGIN_URL = 'login'
 
-CSRF_TRUSTED_ORIGINS = ['https://onlinemetermysqlproject-production.up.railway.app']
+CSRF_TRUSTED_ORIGINS = ['https://onlinemetermysqlproject-production.up.railway.app','http://127.0.0.1:8000/']
