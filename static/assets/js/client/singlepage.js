@@ -60,7 +60,7 @@ $(document).ready(function () {
               </div>
             </div><!--//col-->
           </div><!--//row-->
-          <a class="link-mask" href= "../notifications?id=${r.id}&param=${clientid}"></a>
+          <a class="link-mask" href= "/notifications?id=${r.id}&param=${clientid}"></a>
         </div> </div>`
           console.log(html)
           if (r.isseen == false) 

@@ -158,21 +158,37 @@ def addBillRecord(billdate, realtime):
 def settings(request,id):
     if request.user.is_authenticated:
         template = loader.get_template('client/updatesettings.html')
-        client = ClientInfo.objects.filter(user_id = request.user.id).first()
-        client.switchid = 1
-        if client.switch:
-                client.switchid = 2
-                
-        context = {'client' : client}
+        context = getsettings(request)
     
     else:
         template = loader.get_template('accounts/login.html')
     return HttpResponse(template.render(context,request))
 
+def updatesettings(request,id):
+    from django.contrib import messages
+    checked = request.POST.get('switch-meter', False)  
+    if checked is not False:
+            checked = True 
+    switchs = 'ON' if checked else 'OFF'
+    client = ClientInfo.objects.filter(user_id = request.user.id)
+    client.update(switch = checked)
+    messages.success(request, 'You have turned the meter switch '+ switchs)
+    template = loader.get_template('client/updatesettings.html')
+    context = getsettings(request)
+    return HttpResponse(template.render(context,request))
+   
 
-@login_required(login_url='/accounts/login/')  
+def getsettings(request):
+    client = ClientInfo.objects.filter(user_id = request.user.id).first()
+    client.switchid = 1
+    if client.switch:
+            client.switchid = 2
+                
+    context = {'client' : client}
+    return context
 
 
+@login_required(login_url='/accounts/login/') 
 def notifications(request):
     if request.user.is_authenticated:
         param = request.GET.get('param')
@@ -201,9 +217,7 @@ def notifications(request):
     else:
         return HttpResponseRedirect(reverse('404'))
 
-def updatesettings(request,id):
-    checked = request.POST.get('switch-meter', False)    
-    return HttpResponseRedirect(reverse('index'))  
+
     
 
 def getmeter(request):

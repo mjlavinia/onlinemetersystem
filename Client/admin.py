@@ -36,10 +36,10 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         #obj.some_field = some_value # Update some_field with the desired value
-        super().save_model(request, obj, form, change) # Call the superclass method to save the model
         notif = Notifications()
         if obj.isactive == False:
             notif.message = 'The admin has made your account inactive. Please check with the admin the status of your acount.'
+            obj.switch = False
         else:
             notif.message = 'The admin has activated your account.'
 
@@ -47,6 +47,8 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
         notif.timestamp = datetime.datetime.now()
         notif.isseen = False
         notif.save()
+        super().save_model(request, obj, form, change) # Call the superclass method to save the model
+        
 # Register your models here..re
 
 @admin.register(RealTimeBill)
