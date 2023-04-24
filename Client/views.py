@@ -31,6 +31,8 @@ def index(request):
             billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month).first()
             if billing is None:
                 billing = Billing.objects.filter(meterid_id = client.id, billingyear = year, billingmonth = month-1).first()
+                if billing is None:
+                    billing = Billing(totalconsumed = 0,billingmonth = timezone.now().month-1, billingyear = timezone.now().year)
                    
             realtime = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
             
@@ -86,7 +88,7 @@ def chart(request):
     current_user = request
     template = loader.get_template('client/chart.html')
     client = ClientInfo.objects.filter(user_id = request.user.id).first()
-    start_date = datetime.datetime.now() - datetime.timedelta(30)
+    start_date = timezone.now() - datetime.timedelta(30)
     if client != None:
         consumed_in_a_month = RealTimeBill.objects.filter(meterid_id =   client.id,timestamp__gte = start_date).all()
      
@@ -112,7 +114,7 @@ def savemeter(request):
         
         if client:
             if client.switch is not False:
-                realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
+                realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = timezone.now()).order_by('-id').first()
                 updateId = None
                 msg = 'new record added'
                 if realtimeRecord:
@@ -127,7 +129,7 @@ def savemeter(request):
                 newMeter.save()
                 if now.minute == 58:
                     meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
-                    meterlog.timestamp = datetime.datetime.now()
+                    meterlog.timestamp = timezone.now()
                     meterlog.save()  
                  
 
@@ -225,10 +227,11 @@ def notifications(request):
 def getmeter(request):
     id = request.GET.get('id')
     realtimeRecord = RealTimeBill.objects.filter(meterid_id = id).order_by('-id').first()
+    
     realtime = round(realtimeRecord.totalconsumption,3)
     currentread = round(realtimeRecord.currentread,2) if realtimeRecord.meterid.isactive else '(DEACTIVATED)'
     # Return a JSON response of the data
-    return JsonResponse({'isactive': realtimeRecord.meterid.isactive ,'switch':realtimeRecord.meterid.switch,'dateread': str((datetime.datetime.today())),'total':str(realtime), 'currentread':str(currentread),'amount': 'Php ' +  str(pricing(realtimeRecord.totalconsumption))})
+    return JsonResponse({'isactive': realtimeRecord.meterid.isactive ,'switch':realtimeRecord.meterid.switch,'dateread': str((timezone.now())),'total':str(realtime), 'currentread':str(currentread),'amount': 'Php ' +  str(pricing(realtimeRecord.totalconsumption))})
 
 def getnotif(request):
     id = request.GET.get('id')

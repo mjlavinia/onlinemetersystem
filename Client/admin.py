@@ -7,7 +7,10 @@ from django.utils import timezone
 #admin.site.register(BillingInfo)
 #admin.site.register(RealTimeBill)
 
-admin.site.register(Billing)
+@admin.register(Billing)
+class BillingAdmin(admin.ModelAdmin):
+    model = Billing
+    list_display = ('meterid', 'billingyear', 'billingmonth', 'totalconsumed') 
 
 class tabularRealtime(TabularInlinePaginated):
     model = RealTimeBill
