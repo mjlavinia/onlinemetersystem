@@ -19,13 +19,15 @@ $(document).ready(function () {
         document.getElementById('total').innerHTML = data.total
         document.getElementById('dateread').innerHTML = dateread
         switchstate =  (data.switch)? 'ON':'OFF'
-        switchstate = 'Switch Status : ' + switchstate
+        switchstate = 'Switch: ' + switchstate
 
         let isnum = /^\d+$/.test(data.currentread);
         if (!data.isactive) 
           document.getElementById('currentread').style.color = 'gray'
-        document.getElementById('switch-status').innerHTML =  switchstate
-        document.getElementById('switch-status').style.color =   (data.switch)? 'green':'red'
+        var switch_html = document.getElementById('switch-status')
+        switch_html.innerHTML =  switchstate
+        switch_html.classList.add ((data.switch)? 'bg-success':'bg-danger')
+
         document.getElementById('amount').innerHTML = data.amount
       })
       .catch(error => {
