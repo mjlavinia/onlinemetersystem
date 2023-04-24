@@ -18,6 +18,14 @@ $(document).ready(function () {
         document.getElementById('currentread').innerHTML = data.currentread
         document.getElementById('total').innerHTML = data.total
         document.getElementById('dateread').innerHTML = dateread
+        switchstate =  (data.switch)? 'ON':'OFF'
+        switchstate = 'Switch Status : ' + switchstate
+
+        let isnum = /^\d+$/.test(data.currentread);
+        if (!data.isactive) 
+          document.getElementById('currentread').style.color = 'gray'
+        document.getElementById('switch-status').innerHTML =  switchstate
+        document.getElementById('switch-status').style.color =   (data.switch)? 'green':'red'
         document.getElementById('amount').innerHTML = data.amount
       })
       .catch(error => {

@@ -20,6 +20,7 @@ class ClientInfo(models.Model):
     billingday = models.SmallIntegerField(null= False)
     switch = models.BooleanField()
     isactive = models.BooleanField()
+    remarks = models.CharField(null=True, blank=False, max_length=50)
     
     def __str__(self):
         return str(self.meterid)

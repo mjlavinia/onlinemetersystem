@@ -15,7 +15,7 @@ from decimal import Decimal
 import json
 from .tool.functools import setLastMonth,setLastYear,setTimeNotifications
 from django.core import serializers
-from django.utils.timezone import localtime
+from django.utils import timezone,dateformat
 
 @login_required(login_url='/accounts/login/')   
 def index(request):
@@ -111,28 +111,28 @@ def savemeter(request):
         
         
         if client:
+            if client.switch is not False:
+                realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
+                updateId = None
+                msg = 'new record added'
+                if realtimeRecord:
+                   updateId= realtimeRecord.id
+                   msg = 'update ID:' + str(updateId)
 
-            realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = datetime.date.today()).first()
-            updateId = None
-            msg = 'new record added'
-            if realtimeRecord:
-               updateId= realtimeRecord.id
-               msg = 'update ID:' + str(updateId)
-            
-            total  = Decimal(request.GET.get('total'))
-            current  = Decimal(request.GET.get('current'))
-            newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
-            newMeter.switch = client.switch    
-            addBillRecord(client.billingdate, newMeter)     
-            
-            if now.minute == 58:
-                meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
-                meterlog.timestamp = datetime.datetime.now()
-                meterlog.save()  
-                
+                total  = Decimal(request.GET.get('total'))
+                current  = Decimal(request.GET.get('current'))
+                newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
+                newMeter.switch = client.switch    
+                addBillRecord(client.billingdate, newMeter)     
+                newMeter.save()
+                if now.minute == 58:
+                    meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
+                    meterlog.timestamp = datetime.datetime.now()
+                    meterlog.save()  
+                 
 
         
-        newMeter.save()
+       
         return JsonResponse({'switch': str(client.switch), 'msg':msg})
     except Exception as e:
         return JsonResponse({'error': e.args})
@@ -169,10 +169,12 @@ def updatesettings(request,id):
     checked = request.POST.get('switch-meter', False)  
     if checked is not False:
             checked = True 
-    switchs = 'ON' if checked else 'OFF'
+    switchmsg = '' if checked else 'turned OFF by user dated ' + dateformat.format(timezone.now(), 'Y-m-d H:i:s')
+    switchstate ='ON' if checked else 'OFF'
     client = ClientInfo.objects.filter(user_id = request.user.id)
-    client.update(switch = checked)
-    messages.success(request, 'You have turned the meter switch '+ switchs)
+
+    client.update(switch = checked,remarks = switchmsg) 
+    messages.success(request, 'You have turned the meter switch '+ switchstate )
     template = loader.get_template('client/updatesettings.html')
     context = getsettings(request)
     return HttpResponse(template.render(context,request))
@@ -222,11 +224,11 @@ def notifications(request):
 
 def getmeter(request):
     id = request.GET.get('id')
-    realtimeRecord = RealTimeBill.objects.filter(meterid_id = id, timestamp = datetime.date.today()).first()
-    realtime = round(realtimeRecord.totalconsumption/1000,2)
-    currentread = round(realtimeRecord.currentread,2)
+    realtimeRecord = RealTimeBill.objects.filter(meterid_id = id).order_by('-id').first()
+    realtime = round(realtimeRecord.totalconsumption,3)
+    currentread = round(realtimeRecord.currentread,2) if realtimeRecord.meterid.isactive else '(DEACTIVATED)'
     # Return a JSON response of the data
-    return JsonResponse({'dateread': str((datetime.datetime.today())),'total':str(realtime), 'currentread':str(currentread),'amount': 'Php ' +  str(pricing(realtimeRecord.totalconsumption/1000))})
+    return JsonResponse({'isactive': realtimeRecord.meterid.isactive ,'switch':realtimeRecord.meterid.switch,'dateread': str((datetime.datetime.today())),'total':str(realtime), 'currentread':str(currentread),'amount': 'Php ' +  str(pricing(realtimeRecord.totalconsumption))})
 
 def getnotif(request):
     id = request.GET.get('id')

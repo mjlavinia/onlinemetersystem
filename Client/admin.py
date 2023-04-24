@@ -3,7 +3,7 @@ from django.forms import Select
 from .models import BillingInfo,ClientInfo,RealTimeBill,Billing,MeterLog,Pricing,Notifications
 from django_admin_inline_paginator.admin import TabularInlinePaginated
 import datetime
-
+from django.utils import timezone
 #admin.site.register(BillingInfo)
 #admin.site.register(RealTimeBill)
 
@@ -26,7 +26,7 @@ class MeterlogDetail(TabularInlinePaginated):
     
 @admin.register(ClientInfo)  
 class CLientInforAdminWithPage(admin.ModelAdmin):
-    list_display = ('meterid','fullname','switch','meterserial')
+    list_display = ('meterid','fullname','isactive','meterserial','switch','remarks')
     inlines = (Billings,tabularRealtime,MeterlogDetail)
     model = ClientInfo
     
@@ -44,7 +44,7 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
             notif.message = 'The admin has activated your account.'
 
         notif.meterid_id = obj.id
-        notif.timestamp = datetime.datetime.now()
+        notif.timestamp = timezone.now()
         notif.isseen = False
         notif.save()
         super().save_model(request, obj, form, change) # Call the superclass method to save the model
