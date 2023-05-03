@@ -209,7 +209,7 @@ def notifications(request):
             notif = [savenotif]
             
         else:
-            notif = Notifications.objects.filter(meterid_id = param).order_by('-timestamp', 'isseen').all()[:10]
+            notif = Notifications.objects.filter(meterid_id = param).order_by('-timestamp', 'isseen').all()[:7]
             period_dateNotification(notif)
         template ='client/notifications.html'  
         client = ClientInfo.objects.get(id = param)

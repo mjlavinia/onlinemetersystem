@@ -42,7 +42,9 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
         client = ClientInfo.objects.filter(id = obj.id).first()
         
         notif = Notifications()
+        haschanges = False;
         if client.isactive != obj.isactive:
+            haschanges = True
             if obj.isactive == False:
                 notif.message = 'The admin has made your account inactive. Please check with the admin the status of your acount.'
                 obj.switch = False
@@ -50,6 +52,7 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
                 notif.message = 'The admin has activated your account.'
             
         if client.switch != obj.switch: 
+            haschanges = True
             if obj.switch == False: 
                  notif.message = 'The admin turned the meter switch OFF.'
             else:
@@ -58,7 +61,8 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
         notif.meterid_id = obj.id
         notif.timestamp = timezone.now()
         notif.isseen = False
-        notif.save()
+        if haschanges:
+            notif.save()
         super().save_model(request, obj, form, change) # Call the superclass method to save the model
         
 # Register your models here..re
