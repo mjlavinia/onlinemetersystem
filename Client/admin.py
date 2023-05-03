@@ -39,13 +39,22 @@ class CLientInforAdminWithPage(admin.ModelAdmin):
     
     def save_model(self, request, obj, form, change):
         #obj.some_field = some_value # Update some_field with the desired value
+        client = ClientInfo.objects.filter(id = obj.id).first()
+        
         notif = Notifications()
-        if obj.isactive == False:
-            notif.message = 'The admin has made your account inactive. Please check with the admin the status of your acount.'
-            obj.switch = False
-        else:
-            notif.message = 'The admin has activated your account.'
-
+        if client.isactive != obj.isactive:
+            if obj.isactive == False:
+                notif.message = 'The admin has made your account inactive. Please check with the admin the status of your acount.'
+                obj.switch = False
+            else:
+                notif.message = 'The admin has activated your account.'
+            
+        if client.switch != obj.switch: 
+            if obj.switch == False: 
+                 notif.message = 'The admin turned the meter switch OFF.'
+            else:
+                notif.message = 'The admin turned the meter switch ON.'
+                
         notif.meterid_id = obj.id
         notif.timestamp = timezone.now()
         notif.isseen = False
