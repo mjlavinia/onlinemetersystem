@@ -112,25 +112,7 @@ def savemeter(request):
         now = timezone.now()
         
         
-        if client:
-            if client.switch is not False:
-                realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = timezone.now()).order_by('-id').first()
-                updateId = None
-                msg = 'new record added'
-                if realtimeRecord:
-                   updateId= realtimeRecord.id
-                   msg = 'update ID:' + str(updateId)
-
-                total  = Decimal(request.GET.get('total'))
-                current  = Decimal(request.GET.get('current'))
-                newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
-                newMeter.switch = client.switch    
-                addBillRecord(client.billingdate, newMeter)     
-                newMeter.save()
-                if now.minute == 58:
-                    meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
-                    meterlog.timestamp = timezone.now()
-                    meterlog.save()  
+        msg = savingmeter(request, client, now)  
                  
 
         
@@ -138,6 +120,28 @@ def savemeter(request):
         return JsonResponse({'switch': str(client.switch), 'msg':msg})
     except Exception as e:
         return JsonResponse({'error': e.args})
+
+def savingmeter(request, client, now):
+    if client:
+        if client.switch is not False:
+            realtimeRecord = RealTimeBill.objects.filter(meterid_id = client.id, timestamp = timezone.now()).order_by('-id').first()
+            updateId = None
+            msg = 'new record added'
+            if realtimeRecord:
+               updateId= realtimeRecord.id
+               msg = 'update ID:' + str(updateId)
+
+            total  = Decimal(request.GET.get('total'))
+            current  = Decimal(request.GET.get('current'))
+            newMeter = RealTimeBill(id = updateId ,meterid_id = client.id, totalconsumption = total, timestamp = datetime.date.today(), currentread = current)
+            newMeter.switch = client.switch    
+            addBillRecord(client.billingdate, newMeter)     
+            newMeter.save()
+            if now.minute == 58:
+                meterlog = MeterLog(meterid_id = client.id, totalconsumption = total, currentread = current)
+                meterlog.timestamp = timezone.now()
+                meterlog.save()
+    return msg
     
 def addBillRecord(billdate, realtime):
     if (billdate.day+ 1 == realtime.timestamp.day): 
