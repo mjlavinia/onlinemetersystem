@@ -239,7 +239,7 @@ def getmeter(request):
 
 def getnotif(request):
     id = request.GET.get('id')
-    data = Notifications.objects.filter(meterid_id = id).order_by('-timestamp', 'isseen').all().values()[:7]
+    data = Notifications.objects.filter(meterid_id = id).order_by('-timestamp', 'isseen').all().values()[:6]
     for d in data:
         d['period']= setTimeNotifications(d.get('timestamp'))
     notif = json.dumps(list(data), default=str)
