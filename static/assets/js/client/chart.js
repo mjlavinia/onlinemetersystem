@@ -115,6 +115,7 @@ window.addEventListener('load', function(){
 	console.log(data);
 	var lineChart = document.getElementById('chart-line').getContext('2d');
 	
+	this.print(myDataElement)
 	convertjsontographdata();
 
 	window.myLine = new Chart(lineChart, lineChartConfig);
